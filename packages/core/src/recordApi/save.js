@@ -1,19 +1,8 @@
-import { cloneDeep, take, takeRight, flatten, map, filter } from "lodash/fp"
+import { cloneDeep, take, takeRight } from "lodash/fp"
 import { validate } from "./validate"
 import { _loadFromInfo } from "./load"
-import { apiWrapper, events, $, joinKey } from "../common"
-import {
-  getFlattenedHierarchy,
-  isRecord,
-  getNode,
-  fieldReversesReferenceToNode,
-} from "../templateApi/hierarchy"
-import {
-  transactionForCreateRecord,
-  transactionForUpdateRecord,
-} from "../transactions/create"
+import { apiWrapper, events, joinKey } from "../common"
 import { permission } from "../authApi/permissions"
-import { initialiseIndex } from "../indexing/initialiseIndex"
 import { BadRequestError } from "../common/errors"
 import { getRecordInfo } from "./recordInfo"
 import { initialiseChildren } from "./initialiseChildren"
@@ -54,8 +43,6 @@ export const _save = async (app, record, context, skipValidation = false) => {
   if (recordClone.isNew) {
     if (!recordNode) throw new Error("Cannot find node for " + record.key)
 
-    const transaction = await transactionForCreateRecord(app, recordClone)
-    recordClone.transactionId = transaction.id
     await createRecordFolderPath(app.datastore, pathInfo)
     await app.datastore.createFolder(files)
     await app.datastore.createJson(recordJson, recordClone)
@@ -65,20 +52,12 @@ export const _save = async (app, record, context, skipValidation = false) => {
     })
   } else {
     const oldRecord = await _loadFromInfo(app, recordInfo)
-    const transaction = await transactionForUpdateRecord(
-      app,
-      oldRecord,
-      recordClone
-    )
-    recordClone.transactionId = transaction.id
     await app.datastore.updateJson(recordJson, recordClone)
     await app.publish(events.recordApi.save.onRecordUpdated, {
       old: oldRecord,
       new: recordClone,
     })
   }
-
-  await app.cleanupTransactions()
 
   const returnedClone = cloneDeep(recordClone)
   returnedClone.isNew = false
