@@ -1,7 +1,4 @@
 import { isUndefined, isString } from "lodash"
-import { take } from "lodash/fp"
-import { splitKey, joinKey, $, keySep } from "../src/common"
-import { getLastPartInKey } from "../src/templateApi/hierarchy"
 import initialiseNano from "nano"
 
 export const getTestDb = async () => {
@@ -26,25 +23,7 @@ const isFolder = val => {
 }
 
 export const createFile = db => async (key, content) => {
-  await addItemToParentFolder(db, key)
   return await db.insert({ _id: key, ...content })
-}
-
-const getParentFolderKey = key =>
-  $(key, [splitKey, take(splitKey(key).length - 1), joinKey])
-
-const getParentFolder = async (db, key) => {
-  if (key === keySep) return null
-  const parentKey = getParentFolderKey(key)
-  if (parentKey === keySep) return null
-  return await db.get(parentKey)
-}
-
-const addItemToParentFolder = async (db, key) => {
-  if (getParentFolderKey(key) === "/") return
-  const parentFolder = await getParentFolder(db, key)
-  parentFolder.items.push(getLastPartInKey(key))
-  await db.insert(parentFolder)
 }
 
 export const updateFile = db => async (key, content) => {
@@ -91,41 +70,14 @@ export const deleteFile = db => async keyOrDoc => {
   const key = isString(keyOrDoc) ? keyOrDoc : doc._id
   if (isFolder(doc))
     throw new Error("DeleteFile: Path " + key + " is a folder, not a file")
-  const parentFolder = await getParentFolder(db, key)
-  parentFolder.items = parentFolder.items.filter(
-    i => i !== getLastPartInKey(key)
-  )
-  await db.insert(parentFolder)
   await db.destroy(key)
 }
 export const createFolder = db => async key => {
-  await addItemToParentFolder(db, key)
   await db.insert({ _id: key, folderMarker, items: [] })
 }
 
 export const deleteFolder = db => async keyOrDoc => {
-  const doc = isString(keyOrDoc) ? await db.get(keyOrDoc) : keyOrDoc
-  const key = isString(keyOrDoc) ? keyOrDoc : doc._id
-  if (!isFolder(doc))
-    throw new Error("DeleteFolder: Path " + key + " is not a folder")
-
-  for (let item of doc.items) {
-    const fullItemPath = `${key}/${item}`
-    const childDoc = await db.get(fullItemPath)
-    if (isFolder(childDoc)) {
-      await deleteFolder(db)(childDoc)
-    } else {
-      await deleteFile(db)(childDoc)
-    }
-  }
-
-  const parent = await getParentFolder(db, key)
-  if (parent) {
-    parent.items = parent.items.filter(f => f !== getLastPartInKey(key))
-    await db.insert(parent)
-  }
-
-  await db.destroy(key)
+  throw new Error("DELETE FOLDER: should not be needed")
 }
 
 export const getFolderContents = db => async key => {
