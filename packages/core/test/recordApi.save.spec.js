@@ -48,23 +48,6 @@ describe("recordApi > save then load", () => {
     expect(saved.createddate).toEqual(record.createddate)
   })
 
-  it("loaded record isNew() always return false", async () => {
-    const { recordApi } = await setupApphierarchy(
-      basicAppHierarchyCreator_WithFields
-    )
-    const record = recordApi.getNew("/customers", "customer")
-
-    record.age = 9
-    record.createddate = new Date()
-
-    await recordApi.save(record)
-
-    const saved = await recordApi.load(record.key)
-
-    expect(saved.isNew).toBeDefined()
-    expect(saved.isNew).toBe(false)
-  })
-
   it("loaded record id() and key() should work", async () => {
     const { recordApi } = await setupApphierarchy(
       basicAppHierarchyCreator_WithFields
@@ -153,16 +136,6 @@ describe("recordApi > save then load", () => {
 })
 
 describe("save", () => {
-  it("IsNew() should return false after save", async () => {
-    const { recordApi } = await setupApphierarchy(
-      basicAppHierarchyCreator_WithFields
-    )
-    const record = recordApi.getNew("/customers", "customer")
-    record.surname = "Ledog"
-
-    const savedRecord = await recordApi.save(record)
-    expect(savedRecord.isNew).toBe(false)
-  })
 
   it("should publish onbegin and oncomplete events", async () => {
     const { recordApi, subscribe } = await setupApphierarchy(
@@ -259,8 +232,7 @@ describe("save", () => {
       basicAppHierarchyCreator_WithFields
     )
     const record = recordApi.getNew("/customers", "customer")
-    await recordApi.save(record)
-    const saved = await recordApi.load(record.key)
+    const saved = await recordApi.save(record)
     app.withOnlyThisPermission(
       permission.updateRecord.get(appHierarchy.customerRecord.nodeKey())
     )

@@ -1,20 +1,18 @@
-import { cloneDeep, take, takeRight } from "lodash/fp"
+import { cloneDeep } from "lodash/fp"
 import { validate } from "./validate"
 import { _load } from "./load"
-import { apiWrapper, events, joinKey } from "../common"
+import { apiWrapper, events } from "../common"
 import { permission } from "../authApi/permissions"
 import { BadRequestError } from "../common/errors"
-import { getRecordInfo } from "./recordInfo"
-import { initialiseChildren } from "./initialiseChildren"
 import { getExactNodeForKey } from "../templateApi/hierarchy"
 
 export const save = app => async (record, context) =>
   apiWrapper(
     app,
     events.recordApi.save,
-    record.isNew
-      ? permission.createRecord.isAuthorized(record.key)
-      : permission.updateRecord.isAuthorized(record.key),
+    record._rev
+      ? permission.updateRecord.isAuthorized(record.key)
+      : permission.createRecord.isAuthorized(record.key),
     { record },
     _save,
     app,
@@ -42,12 +40,11 @@ export const _save = async (app, record, context, skipValidation = false) => {
 
   recordClone.nodeKey = recordNode.nodeKey()
 
-  if (recordClone.isNew) {
+  if (!record._rev) {
     if (!recordNode) throw new Error("Cannot find node for " + record.key)
 
     // FILES
     // await app.datastore.createFolder(files)
-    delete recordClone.isNew
     await app.datastore.createJson(record.key, recordClone)
     await app.publish(events.recordApi.save.onRecordCreated, {
       record: recordClone,
@@ -61,7 +58,7 @@ export const _save = async (app, record, context, skipValidation = false) => {
     })
   }
 
-  const returnedClone = cloneDeep(recordClone)
-  returnedClone.isNew = false
-  return returnedClone
+  const savedResult = await app.datastore.loadFile(record.key)
+  recordClone._rev = savedResult._rev
+  return recordClone
 }

@@ -31,5 +31,5 @@ export const _deleteRecord = async (app, key) => {
     await _deleteCollection(app, collectionKey, true)
   }
 
-  await app.datastore.deleteFolder(recordInfo.dir)
+  await app.datastore.deleteFile(key)
 }

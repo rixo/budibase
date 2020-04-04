@@ -66,7 +66,6 @@ export const _load = async (app, key, keyStack = []) => {
 
   loadedRecord._rev = storedData._rev
   loadedRecord._id = storedData._id
-  loadedRecord.isNew = false
   loadedRecord.key = key
   loadedRecord.id = $(key, [splitKey, last])
   loadedRecord.type = recordNode.name
