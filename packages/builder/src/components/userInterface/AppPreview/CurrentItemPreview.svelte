@@ -6,6 +6,7 @@
 
   let iframe
   let styles = ""
+  let style = ""
 
   function transform_component(comp) {
     const props = comp.props || comp
