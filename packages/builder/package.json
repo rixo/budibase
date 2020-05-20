@@ -4,11 +4,13 @@
   "license": "AGPL-3.0",
   "private": true,
   "scripts": {
-    "build": "routify --routify-dir routify -b && rollup -c",
-    "start": "routify --routify-dir routify -c rollup",
+    "routify": "routify --routify-dir routify -c",
+    "routify:build": "routify --routify-dir routify -b",
+    "build": "npm run routify:build && rollup -c",
+    "start": "npm run routify rollup",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "dev:builder": "routify --routify-dir routify -c rollup",
+    "dev:builder": "npm run routify rollup",
     "rollup": "rollup -c -w"
   },
   "jest": {
