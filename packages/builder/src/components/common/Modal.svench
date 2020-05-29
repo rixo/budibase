@@ -1,0 +1,22 @@
+<script>
+  import { View } from 'svench'
+  import Modal from './Modal.svelte'
+
+  let isOpen = false
+</script>
+
+<View knobs={{title: 'Lorem ipsum'}} let:knobs={{title}}>
+  <Modal {isOpen} {title} onClosed={() => isOpen = false}>
+    <pre>isOpen = {isOpen}</pre>
+  </Modal>
+
+  <button on:click={() => isOpen = true}>Open</button>
+
+  <pre>isOpen = {isOpen}</pre>
+</View>
+
+<View name="isOpen" hide>
+  <Modal isOpen title="Always opened" onClosed={() => {}}>
+    <pre>isOpen = {isOpen}</pre>
+  </Modal>
+</View>

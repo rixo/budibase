@@ -1,5 +1,5 @@
 import alias from "@rollup/plugin-alias"
-import svelte from "rollup-plugin-svelte"
+import svelte from "rollup-plugin-svelte-hot"
 import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
 import url from "rollup-plugin-url"
@@ -10,10 +10,13 @@ import nodeglobals from "rollup-plugin-node-globals"
 import copy from "rollup-plugin-copy"
 import replace from "rollup-plugin-replace"
 import json from "@rollup/plugin-json"
+import hmr from "rollup-plugin-hot"
 
 import path from "path"
 
-const production = !process.env.ROLLUP_WATCH
+const SVENCH = !!process.env.SVENCH
+const production = !process.env.ROLLUP_WATCH && !SVENCH
+const HOT = !production && process.env.HOT != "0"
 
 const lodash_fp_exports = [
   "flow",
@@ -177,12 +180,13 @@ export default {
     svelte({
       // enable run-time checks when not in production
       dev: !production,
-      include: ["src/**/*.svelte", "node_modules/**/*.svelte"],
+      // include: ["src/**/*.svelte", "node_modules/**/*.svelte"],
       // we'll extract any component CSS out into
       // a separate file — better for performance
       css: css => {
         css.write(`${outputpath}/bundle.css`)
       },
+      hot: HOT,
     }),
 
     resolve({
@@ -219,11 +223,15 @@ export default {
 
     // Watch the `dist` directory and refresh the
     // browser on changes when not in production
-    !production && livereload(outputpath),
+    !production && !HOT && livereload(outputpath),
 
     // If we're building for production (npm run build
     // instead of npm run dev), minify
     production && terser(),
     json(),
+    hmr({
+      compatModuleHot: !HOT,
+      inMemory: true,
+    }),
   ],
 }

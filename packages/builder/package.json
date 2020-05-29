@@ -9,6 +9,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "dev:builder": "routify --routify-dir routify -c rollup",
+    "svench": "rollup -w -c svench.config.js",
     "rollup": "rollup -c -w"
   },
   "jest": {
@@ -73,14 +74,17 @@
     "rollup-plugin-browsersync": "^1.0.0",
     "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-copy": "^3.0.0",
+    "rollup-plugin-hot": "^0.0.24",
     "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^5.0.3",
+    "rollup-plugin-svelte-hot": "^0.7.0",
     "rollup-plugin-terser": "^4.0.4",
     "rollup-plugin-url": "^2.2.2",
-    "svelte": "3.23.x"
+    "svelte": "3.23.x",
+    "svench": "^0.0.9-6"
   },
   "gitHead": "115189f72a850bfb52b65ec61d932531bf327072"
 }

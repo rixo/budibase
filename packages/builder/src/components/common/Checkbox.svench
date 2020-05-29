@@ -1,0 +1,16 @@
+<script>
+  import { View } from 'svench'
+  import Checkbox from './Checkbox.svelte'
+</script>
+
+<View name="demo" hide knobs={{checked: false}} let:knobs={{checked}}>
+  <Checkbox {checked} />
+</View>
+
+<View name="checked">
+  <Checkbox checked />
+</View>
+
+<View name="unchecked">
+  <Checkbox checked={false} />
+</View>

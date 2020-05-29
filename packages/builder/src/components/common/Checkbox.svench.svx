@@ -1,0 +1,15 @@
+<script>
+  import { Render } from 'svench'
+</script>
+
+# Checkbox
+
+## Demo
+
+Go and tell me how you feel about this knobs that lets you toggle the state of a checkbox component? Huh?
+
+<Render view="demo" />
+
+## All states
+
+<Render />
