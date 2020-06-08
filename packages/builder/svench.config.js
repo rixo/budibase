@@ -12,7 +12,7 @@ export default svenchify("./rollup.config.js", {
     public: [
       // NOTE this is where svenchify builds svench by default, by overriding
       // your config's output (you can control this with override option)
-      ".svench/build",
+      ".svench/dist",
       {
         dir: "../server/builder",
         base: "/_builder",
